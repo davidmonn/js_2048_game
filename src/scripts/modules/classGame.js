@@ -86,33 +86,55 @@ class Game {
     this.status = 'lose';
   }
 
-  moveLeft() {
-    for (let row = 0; row < this.state.length; row++) {
-      const values = this.state[row].filter((value) => value !== 0);
-      const newRow = [];
+  calcLeft() {
+    let moved = false;
 
-      for (let i = 0; i < values.length; i++) {
-        if (values[i] === values[i + 1]) {
-          const mergedValue = values[i] + values[i + 1];
+    for (let i = 0; i < this.state.length; i++) {
+      const oldRow = [...this.state[i]];
+      const newRow = this.moveLeft(this.state[i]);
 
-          newRow.push(mergedValue);
-          this.score += mergedValue;
-          i++;
-        } else {
-          newRow.push(values[i]);
-        }
+      this.state[i] = newRow;
+
+      if (oldRow.toString() !== newRow.toString()) {
+        moved = true;
       }
-
-      while (newRow.length < 4) {
-        newRow.push(0);
-      }
-
-      this.state[row] = newRow;
     }
+
+    return moved;
+  }
+
+  moveLeft(row) {
+    const verif = row.filter((val) => {
+      return val !== 0;
+    });
+
+    const arr = [];
+
+    for (let i = 0; i < verif.length; i++) {
+      if (verif[i] === verif[i + 1]) {
+        const save = verif[i] + verif[i + 1];
+
+        arr.push(save);
+        this.score += save;
+        i++;
+      } else {
+        arr.push(verif[i]);
+      }
+    }
+
+    while (arr.length < 4) {
+      arr.push(0);
+    }
+
+    return arr;
   }
 
   moveRight() {
+    let moved = false;
+
     for (let row = 0; row < this.state.length; row++) {
+      const oldRow = [...this.state[row]];
+
       const values = this.state[row].filter((value) => value !== 0);
       const newRow = [];
 
@@ -133,19 +155,26 @@ class Game {
       }
 
       this.state[row] = newRow;
+
+      if (oldRow.toString() !== newRow.toString()) {
+        moved = true;
+      }
     }
+
+    return moved;
   }
 
   moveUp() {
+    let moved = false;
+
     for (let column = 0; column < 4; column++) {
-      const values = [];
+      const oldColumn = [];
 
       for (let row = 0; row < 4; row++) {
-        if (this.state[row][column] !== 0) {
-          values.push(this.state[row][column]);
-        }
+        oldColumn.push(this.state[row][column]);
       }
 
+      const values = oldColumn.filter((value) => value !== 0);
       const newColumn = [];
 
       for (let i = 0; i < values.length; i++) {
@@ -167,11 +196,25 @@ class Game {
       for (let row = 0; row < 4; row++) {
         this.state[row][column] = newColumn[row];
       }
+
+      if (oldColumn.toString() !== newColumn.toString()) {
+        moved = true;
+      }
     }
+
+    return moved;
   }
 
   moveDown() {
+    let moved = false;
+
     for (let column = 0; column < 4; column++) {
+      const oldColumn = [];
+
+      for (let row = 0; row < 4; row++) {
+        oldColumn.push(this.state[row][column]);
+      }
+
       const values = [];
 
       for (let row = 3; row >= 0; row--) {
@@ -201,7 +244,19 @@ class Game {
       for (let row = 0; row < 4; row++) {
         this.state[row][column] = newColumn[3 - row];
       }
+
+      const newColumnState = [];
+
+      for (let row = 0; row < 4; row++) {
+        newColumnState.push(this.state[row][column]);
+      }
+
+      if (oldColumn.toString() !== newColumnState.toString()) {
+        moved = true;
+      }
     }
+
+    return moved;
   }
 
   addRandomTile() {
