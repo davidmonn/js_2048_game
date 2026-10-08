@@ -86,14 +86,32 @@ class Game {
     this.status = 'lose';
   }
 
-  calcLeft() {
+  moveLeft() {
     let moved = false;
 
-    for (let i = 0; i < this.state.length; i++) {
-      const oldRow = [...this.state[i]];
-      const newRow = this.moveLeft(this.state[i]);
+    for (let row = 0; row < this.state.length; row++) {
+      const oldRow = [...this.state[row]];
 
-      this.state[i] = newRow;
+      const values = this.state[row].filter((value) => value !== 0);
+      const newRow = [];
+
+      for (let i = 0; i < values.length; i++) {
+        if (values[i] === values[i + 1]) {
+          const mergedValue = values[i] + values[i + 1];
+
+          newRow.push(mergedValue);
+          this.score += mergedValue;
+          i++;
+        } else {
+          newRow.push(values[i]);
+        }
+      }
+
+      while (newRow.length < 4) {
+        newRow.push(0);
+      }
+
+      this.state[row] = newRow;
 
       if (oldRow.toString() !== newRow.toString()) {
         moved = true;
@@ -101,32 +119,6 @@ class Game {
     }
 
     return moved;
-  }
-
-  moveLeft(row) {
-    const verif = row.filter((val) => {
-      return val !== 0;
-    });
-
-    const arr = [];
-
-    for (let i = 0; i < verif.length; i++) {
-      if (verif[i] === verif[i + 1]) {
-        const save = verif[i] + verif[i + 1];
-
-        arr.push(save);
-        this.score += save;
-        i++;
-      } else {
-        arr.push(verif[i]);
-      }
-    }
-
-    while (arr.length < 4) {
-      arr.push(0);
-    }
-
-    return arr;
   }
 
   moveRight() {
@@ -245,13 +237,13 @@ class Game {
         this.state[row][column] = newColumn[3 - row];
       }
 
-      const newColumnState = [];
+      const currentColumn = [];
 
       for (let row = 0; row < 4; row++) {
-        newColumnState.push(this.state[row][column]);
+        currentColumn.push(this.state[row][column]);
       }
 
-      if (oldColumn.toString() !== newColumnState.toString()) {
+      if (oldColumn.toString() !== currentColumn.toString()) {
         moved = true;
       }
     }
